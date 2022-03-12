@@ -1,5 +1,8 @@
 package com.example.indeedjobfinder;
 
+/**
+ * The type Job details.
+ */
 public class JobDetails {
     private String key;
     private String title;
@@ -10,6 +13,13 @@ public class JobDetails {
     private int ungradedCount = 0;
     private boolean skippedByTitle = false;
 
+    /**
+     * Instantiates a new Job details object
+     *
+     * @param key   the job key
+     * @param title the job title
+     * @param html  the raw html of the job description
+     */
     public JobDetails(String key, String title, String html) {
         this.key = key;
         this.title = title;

@@ -15,6 +15,11 @@ public class IndeedJobFinderApplication {
         SpringApplication.run(IndeedJobFinderApplication.class, args);
     }
 
+    /**
+     * Gets web client builder.
+     *
+     * @return the web client builder
+     */
     @Bean
     public WebClient getWebClientBuilder() {
         return WebClient.builder().exchangeStrategies(ExchangeStrategies.builder()

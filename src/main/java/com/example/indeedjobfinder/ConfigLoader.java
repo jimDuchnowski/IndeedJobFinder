@@ -2,6 +2,10 @@ package com.example.indeedjobfinder;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * The type Config loader.
+ * Load configuration properties from application.properties starting with the prefix "my"
+ */
 @ConfigurationProperties(prefix = "my")
 public class ConfigLoader {
     private String jobCompany;

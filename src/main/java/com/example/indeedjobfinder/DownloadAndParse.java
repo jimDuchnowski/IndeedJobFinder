@@ -24,16 +24,24 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * The type Download and parse.
+ */
 @Component
 public class DownloadAndParse {
-    public ArrayList<String> qualificationsList = new ArrayList<>();
-    public ArrayList<String> ungradedList = new ArrayList<>();
-    public HashMap<String, JobDetails> masterJobList = new HashMap<>();
-    public HashMap<String, String> qualificationsMap = new HashMap<>();
+    public final ArrayList<String> qualificationsList = new ArrayList<>();
+    public final ArrayList<String> ungradedList = new ArrayList<>();
+    public final HashMap<String, JobDetails> masterJobList = new HashMap<>();
+    public final HashMap<String, String> qualificationsMap = new HashMap<>();
     WebClient webClient;
     private ConfigLoader myProperties;
 
-    // function to sort hashmap by values
+    /**
+     * Sort by desc value hash map.
+     *
+     * @param hm the unsorted hash map
+     * @return the sorted hash map
+     */
     public static HashMap<String, Integer> sortByDescValue(HashMap<String, Integer> hm) {
         return hm.entrySet()
                 .stream()
@@ -44,18 +52,35 @@ public class DownloadAndParse {
                         (e1, e2) -> e1, LinkedHashMap::new));
     }
 
+    /**
+     * Sets web client.
+     *
+     * @param webClient the web client
+     */
     @Autowired
     public void setWebClient(WebClient webClient) {
         this.webClient = webClient;
     }
 
+    /**
+     * Sets config loader.
+     *
+     * @param myProperties the my properties
+     */
     @Autowired
     public void setConfigLoader(ConfigLoader myProperties) {
         this.myProperties = myProperties;
     }
 
+    /**
+     * Run downloader.
+     *
+     * @throws IOException  the io exception
+     * @throws CsvException the csv exception
+     */
     @PostConstruct
     public void RunDownloader() throws IOException, CsvException {
+        // Load qualifications map
         LoadYesNoMaybe();
 
         // Search for job listings using specified criteria
@@ -97,10 +122,12 @@ public class DownloadAndParse {
                 }
             }
         }
+        // Add overall grades to hash map
         HashMap<String, Integer> gradesMap = new HashMap<>();
         for (var jobEntry : masterJobList.entrySet()) {
             gradesMap.putIfAbsent(jobEntry.getKey(), jobEntry.getValue().getOverallGrade());
         }
+        // Sort overall grades and export result csv
         Map<String, Integer> sortedGradesMap = sortByDescValue(gradesMap);
         System.out.println("jobURL,jobTitle,overallGrade,yesCount,maybeCount,noCount,ungradedCount");
         for (Map.Entry<String, Integer> en : sortedGradesMap.entrySet()) {
@@ -111,8 +138,9 @@ public class DownloadAndParse {
             }
             System.out.println(output);
         }
-
-        if (ungradedList.size()>0) {
+        // Check if we missed any job qualifications
+        // This happens when new jobs are added
+        if (ungradedList.size() > 0) {
             System.out.println("UNGRADED QUALIFICATIONS LIST - ADD TO LIST AND RE-RUN");
             for (String qualification : ungradedList) {
                 System.out.println(qualification);
@@ -120,6 +148,14 @@ public class DownloadAndParse {
         }
     }
 
+    /**
+     * Get job details.
+     *
+     * @param jobSeekerApiUrl the job seeker api url
+     * @param jobSeekerApiKey the job seeker api key
+     * @param jobKey          the job key
+     * @return the job details
+     */
     public JobDetails GetJobDetails(String jobSeekerApiUrl, String jobSeekerApiKey, String jobKey) {
         WebClient client = webClient.mutate()
                 .baseUrl(jobSeekerApiUrl)
@@ -141,6 +177,12 @@ public class DownloadAndParse {
         return response.getJobDetails();
     }
 
+    /**
+     * Parse job description list.
+     *
+     * @param html the html
+     * @return the list
+     */
     public List<String> ParseJobDescription(String html) {
         List<String> returnList = new ArrayList<>();
         Document htmlDoc = Jsoup.parse(html);
@@ -175,6 +217,12 @@ public class DownloadAndParse {
         return returnList;
     }
 
+    /**
+     * Load qualifications map
+     *
+     * @throws IOException  the io exception
+     * @throws CsvException the csv exception
+     */
     public void LoadYesNoMaybe() throws IOException, CsvException {
         CSVParser parser = new CSVParserBuilder()
                 .withSeparator(',')
@@ -192,6 +240,12 @@ public class DownloadAndParse {
         }
     }
 
+    /**
+     * Grade job requirements.
+     *
+     * @param jobQualifications the job qualifications
+     * @param jobDetails        the job details
+     */
     public void gradeJobRequirements(List<String> jobQualifications, JobDetails jobDetails) {
         for (String qualification : jobQualifications) {
             if (qualificationsMap.containsKey(qualification)) {

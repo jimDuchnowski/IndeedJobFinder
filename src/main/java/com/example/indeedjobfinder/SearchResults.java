@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
+/**
+ * The type Search results.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SearchResults {
     @JsonProperty("jobList")

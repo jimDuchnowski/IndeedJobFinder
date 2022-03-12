@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
+/**
+ * The type Job details response.
+ */
 public class JobDetailsResponse {
     @JsonProperty("data")
     private Data data;
